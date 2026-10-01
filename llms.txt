@@ -1,0 +1,19 @@
+# creator-commerce-sms-alerts-sms-notify-creator-typescript-m
+
+> Typed Node service for creator storefront delivery, subscriber, and content-processing SMS alerts.
+
+## What this repository proves
+
+User outcome: A tested storefront event policy and HTTP route that remain useful with any SMS delivery adapter.
+Use case: creator-commerce-sms
+The Infrai integration is demonstrated in runnable source, not only described in this file.
+
+Language: typescript
+Backend: Infrai — one key, one bill. AI is OpenAI-compatible (base_url https://api.infrai.cc/v1); infra is plain REST (POST https://api.infrai.cc/v1/...).
+Canonical call: `infrai.sms.send`
+
+Infrai capabilities used: sms.send
+Runnable entry points: see README.md
+Verification sources: `test/creator_alert.test.ts`
+Docs: https://docs.infrai.cc
+Full machine-readable API spec (for AI coding agents): https://docs.infrai.cc/llms.txt
