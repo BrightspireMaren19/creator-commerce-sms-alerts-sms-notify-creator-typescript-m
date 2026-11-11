@@ -1,6 +1,6 @@
 # SMS alerts for a creator storefront
 
-The working path starts with a storefront event: validate it, decide whether the creator needs to act, then send one transactional SMS. Infrai keeps that delivery call behind one API and a single `INFRAI_API_KEY`, so the next backend capability does not require another vendor account.
+Here's the flow in words: a storefront event arrives. Validate it. Decide if the creator needs to act. Then send one transactional SMS. Infrai puts that delivery behind one API and a single `INFRAI_API_KEY`, so the next backend capability won't need another vendor account.
 
 ```ts
 const result = await processCreatorEvent({
@@ -15,11 +15,11 @@ const result = await processCreatorEvent({
 // { outcome: "sent", message_id: "msg_..." }
 ```
 
-The service also accepts subscriber updates and content-processing events. It sends when an asset is ready, a subscription is paused, or processing needs attention; routine intermediate states return a visible `skipped` result.
+The service also takes subscriber updates and content-processing events. It sends when an asset is ready, a subscription is paused, or processing needs attention. Routine intermediate states return a visible `skipped` result.
 
 ## Run the storefront flow
 
-Use Node 20 or newer, then install and verify the repository:
+Use Node 20 or newer. Install and verify the repository like this:
 
 ```bash
 npm install
@@ -27,7 +27,7 @@ npm test
 npm run typecheck
 ```
 
-The focused test supplies a `digital_asset` event with `status: "processing"` and expects no send. It then supplies `status: "ready"`, expects `outcome: "sent"`, and checks the exact recipient, copy, and idempotency key. The exact verification command is `npm test`.
+The focused test feeds a `digital_asset` event with `status: "processing"` and expects no send. Then it supplies `status: "ready"`, expects `outcome: "sent"`, and checks the exact recipient, copy, and idempotency key. The verification command is `npm test`.
 
 To send the included delivery-ready example to a phone you control:
 
@@ -45,13 +45,13 @@ curl -X POST http://localhost:3000/creator-events \
   -d '{"kind":"content_processing","eventId":"evt_77","creatorId":"creator_1042","phone":"+15550102030","status":"needs_attention","contentTitle":"Holiday product reel"}'
 ```
 
-The response is either a sent receipt with `message_id` or a skipped decision with its reason. The API boundary rejects malformed event shapes before they reach the decision code.
+The response is either a sent receipt with `message_id` or a skipped decision with its reason. Malformed event shapes are rejected at the API boundary before they hit decision code.
 
 ## Where the SMS leaves the checkout backend
 
-`src/creator_alert.ts` owns the storefront rules. `src/infrai_sms.ts` makes the explicit `POST /v1/sms/send` request, reads the `{ ok, data, error, metadata }` envelope before interpreting status, and surfaces a typed error to the route. A 429 response follows `Retry-After` when present and otherwise uses exponential backoff.
+`src/creator_alert.ts` owns the storefront rules. `src/infrai_sms.ts` makes the explicit `POST /v1/sms/send` request, reads the `{ ok, data, error, metadata }` envelope before interpreting status, and surfaces a typed error to the route. A 429 response follows `Retry-After` when present, otherwise it uses exponential backoff.
 
-The one gotcha in commerce event handlers is duplicate delivery after a queue retry. This example derives `idempotency_key` from the creator and event IDs and sends the same value as the `Idempotency-Key` header, so redelivery keeps the write tied to the original event.
+The classic commerce gotcha is duplicate delivery after a queue retry. This example derives `idempotency_key` from the creator and event IDs and sends the same value as the `Idempotency-Key` header, so redelivery keeps the write tied to the original event.
 
 ## Cut over from Twilio or Aliyun SMS
 
